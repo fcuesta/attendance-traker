@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSheetsClient, getSheetMatrix, normalizeHeaderDate, SPREADSHEET_ID } from '@/lib/sheets'
 
-const ALLOWED = ['YES', 'NO', 'LATE'] as const
+const ALLOWED = ['YES', 'NO', 'LATE']
 
 function columnToA1(n: number) {
   let s = ''
