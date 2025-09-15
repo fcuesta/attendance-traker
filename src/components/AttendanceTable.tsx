@@ -2,17 +2,19 @@
 import * as React from 'react'
 import { SelectStatus } from './SelectStatus'
 import { Badge } from './Badge'
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
-export type StatusType = 'YES' | 'NO' | 'LATE' | ''
+export type StatusType = 'SI' | 'NO' | 'TARDE' | ''
 export type AttendanceRow = { player: string; status: StatusType; last5Games: StatusType[] }
 
 const STATUS_OPTIONS = [
-  { label: 'YES', value: 'YES', color: 'bg-green-500' },
+  { label: 'SI', value: 'SI', color: 'bg-green-500' },
   { label: 'NO', value: 'NO', color: 'bg-red-500' },
-  { label: 'LATE', value: 'LATE', color: 'bg-yellow-500' },
+  { label: 'TARDE', value: 'TARDE', color: 'bg-yellow-500' },
 ]
 
 export function AttendanceTable({ team, date }: { team: string; date: string }) {
+  const [search, setSearch] = React.useState('')
   const [rows, setRows] = React.useState<AttendanceRow[] | null>(null)
   const [saving, setSaving] = React.useState<Record<string, 'idle' | 'saving' | 'saved' | 'error'>>({})
   const [error, setError] = React.useState<string | null>(null)
@@ -34,7 +36,7 @@ export function AttendanceTable({ team, date }: { team: string; date: string }) 
     }
   }, [team, date])
 
-  const updateRow = async (player: string, status: 'YES' | 'NO' | 'LATE') => {
+  const updateRow = async (player: string, status: 'SI' | 'NO' | 'TARDE') => {
     setSaving((s) => ({ ...s, [player]: 'saving' }))
     // Optimistic UI
     setRows((rows) => rows?.map((r) => (r.player === player ? { ...r, status, last5Games: [...r.last5Games.slice(1), status] } : r)) ?? null)
@@ -61,55 +63,69 @@ export function AttendanceTable({ team, date }: { team: string; date: string }) 
   if (!rows) {
     return (
       <div className="animate-pulse rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
-        Loading attendance...
+        Leyendo asistencia...
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
-      <div className="rounded-2xl overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Player</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Last 5 games</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {rows.map((row) => (
-              <tr key={row.player} className="bg-white dark:bg-gray-900">
-                <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{row.player}</td>
-                <td className="w-[200px] max-w-[200px] px-4 py-2 ">
-                  <div className="flex items-center gap-2">
-                    <SelectStatus
-                      options={STATUS_OPTIONS}
-                      value={row.status || ''}
-                      onChange={(v) => updateRow(row.player, v as 'YES' | 'NO' | 'LATE')}
-                      placeholder="Select..."
-                    />
-                    {saving[row.player] === 'saving' && <Badge>Saving…</Badge>}
-                    {saving[row.player] === 'saved' && <Badge>Saved</Badge>}
-                    {saving[row.player] === 'error' && (
-                      <span className="text-xs text-red-600">Failed. Refresh?</span>
-                    )}
-                  </div> 
-                </td>
-                <td>
-                  <div className="flex items-center gap-2">
-                    {row.last5Games.map((game, index) => (
-                      <div key={index} className={`${STATUS_OPTIONS.find(opt => opt.value === game)?.color ?? 'bg-gray-600'} p-2 rounded-full`}>
-                        &nbsp;
-                      </div>
-                    ))}
-                  </div>
-                </td>
+    <div>
+      <div className="mb-2 flex items-center justify-end">
+        <div className="relative">
+          <MagnifyingGlassIcon className="absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Buscar jugador..."
+            className="pl-10 pr-4 py-2 w-full border rounded-lg focus:outline-none focus:ring focus:border-blue-300 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+        <div className="rounded-2xl overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Jugador/a</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Asistencia</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ultimos 5</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        {error && <div className="text-red-500 mt-2">{error}</div>}
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {rows.filter(row => row.player.toLowerCase().includes(search.toLowerCase())).map((row) => (
+                <tr key={row.player} className="bg-white dark:bg-gray-900">
+                  <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{row.player}</td>
+                  <td className="w-[200px] max-w-[200px] px-4 py-2 ">
+                    <div className="flex items-center gap-2">
+                      <SelectStatus
+                        options={STATUS_OPTIONS}
+                        value={row.status || ''}
+                        onChange={(v) => updateRow(row.player, v as 'SI' | 'NO' | 'TARDE')}
+                        placeholder="Elegir..."
+                      />
+                      {saving[row.player] === 'saving' && <Badge>Saving…</Badge>}
+                      {saving[row.player] === 'saved' && <Badge>Saved</Badge>}
+                      {saving[row.player] === 'error' && (
+                        <span className="text-xs text-red-600">Failed. Refresh?</span>
+                      )}
+                    </div> 
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      {row.last5Games.map((game, index) => (
+                        <div key={index} className={`${STATUS_OPTIONS.find(opt => opt.value === game)?.color ?? 'bg-gray-600'} px-1 rounded-full`}>
+                          &nbsp;
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {error && <div className="text-red-500 mt-2">{error}</div>}
+        </div>
       </div>
     </div>
   )

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getSheetsClient, getSheetMatrix, normalizeHeaderDate, SPREADSHEET_ID } from '@/lib/sheets'
 
-type StatusType = 'YES' | 'NO' | 'LATE' | '';
-const ALLOWED: Array<StatusType> = ['YES', 'NO', 'LATE']
+type StatusType = 'SI' | 'NO' | 'TARDE' | '';
+const ALLOWED: Array<StatusType> = ['SI', 'NO', 'TARDE']
 
 function columnToA1(n: number) {
   // 1 -> A, 2 -> B, ...

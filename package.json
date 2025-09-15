@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@tailwindcss/postcss": "^4.1.13",
     "date-fns": "^3.6.0",
     "googleapis": "^140.0.1",
