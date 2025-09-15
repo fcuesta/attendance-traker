@@ -59,7 +59,7 @@ export function AttendanceTable({
       (rows) =>
         rows?.map((r) =>
           r.player === player
-            ? { ...r, status, last5Games: [...r.last5Games.slice(1), status] }
+            ? { ...r, status, last5Games: [...r.last5Games.slice(0, -1), status] }
             : r
         ) ?? null
     );

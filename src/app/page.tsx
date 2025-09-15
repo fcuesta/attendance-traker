@@ -16,7 +16,6 @@ type DatesResponse = {
 };
 
 export default function Page() {
-  const defaultTeam = localStorage.getItem("defaultTeam") || "";
   const [teams, setTeams] = React.useState<TeamDto[]>([]);
   const [team, setTeam] = React.useState<string>("");
 
@@ -30,6 +29,7 @@ export default function Page() {
       .then((r) => r.json())
       .then((data) => {
         setTeams(data.teams);
+        const defaultTeam = localStorage.getItem("defaultTeam");
         if (defaultTeam && data.teams.find((t) => t.name === defaultTeam))
           setTeam(defaultTeam);
       });
