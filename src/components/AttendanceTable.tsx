@@ -54,35 +54,32 @@ export function AttendanceTable({ team, date }: { team: string; date: string }) 
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
+      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-400 dark:bg-red-950 dark:text-red-200">{error}</div>
     )
   }
   if (!rows) {
     return (
-      <div className="animate-pulse rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="animate-pulse rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
         Loading attendance...
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+      <div className="rounded-2xl overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+          <thead>
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                Player
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                Status
-              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Player</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+              <th className="px-4 py-2"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {rows.map((row) => (
-              <tr key={row.player}>
-                <td className="px-4 py-3 text-sm font-medium text-gray-900">{row.player}</td>
+              <tr key={row.player} className="bg-white dark:bg-gray-900">
+                <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{row.player}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Select
@@ -96,12 +93,13 @@ export function AttendanceTable({ team, date }: { team: string; date: string }) 
                     {saving[row.player] === 'error' && (
                       <span className="text-xs text-red-600">Failed. Retry?</span>
                     )}
-                  </div>
+                  </div> 
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {error && <div className="text-red-500 mt-2">{error}</div>}
       </div>
     </div>
   )
