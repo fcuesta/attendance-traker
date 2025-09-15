@@ -1,14 +1,15 @@
 'use client'
 import * as React from 'react'
-import { Select } from './Select'
+import { SelectStatus } from './SelectStatus'
 import { Badge } from './Badge'
 
-export type AttendanceRow = { player: string; status: 'YES' | 'NO' | 'LATE' | '' }
+export type StatusType = 'YES' | 'NO' | 'LATE' | ''
+export type AttendanceRow = { player: string; status: StatusType; last5Games: StatusType[] }
 
 const STATUS_OPTIONS = [
-  { label: 'YES', value: 'YES' },
-  { label: 'NO', value: 'NO' },
-  { label: 'LATE', value: 'LATE' },
+  { label: 'YES', value: 'YES', color: 'bg-green-500' },
+  { label: 'NO', value: 'NO', color: 'bg-red-500' },
+  { label: 'LATE', value: 'LATE', color: 'bg-yellow-500' },
 ]
 
 export function AttendanceTable({ team, date }: { team: string; date: string }) {
@@ -36,7 +37,7 @@ export function AttendanceTable({ team, date }: { team: string; date: string }) 
   const updateRow = async (player: string, status: 'YES' | 'NO' | 'LATE') => {
     setSaving((s) => ({ ...s, [player]: 'saving' }))
     // Optimistic UI
-    setRows((rows) => rows?.map((r) => (r.player === player ? { ...r, status } : r)) ?? null)
+    setRows((rows) => rows?.map((r) => (r.player === player ? { ...r, status, last5Games: [...r.last5Games.slice(1), status] } : r)) ?? null)
 
     const res = await fetch('/api/attendance', {
       method: 'PATCH',
@@ -73,16 +74,16 @@ export function AttendanceTable({ team, date }: { team: string; date: string }) 
             <tr>
               <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Player</th>
               <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-              <th className="px-4 py-2"></th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Last 5 games</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {rows.map((row) => (
               <tr key={row.player} className="bg-white dark:bg-gray-900">
                 <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{row.player}</td>
-                <td className="px-4 py-3">
+                <td className="w-[200px] max-w-[200px] px-4 py-2 ">
                   <div className="flex items-center gap-2">
-                    <Select
+                    <SelectStatus
                       options={STATUS_OPTIONS}
                       value={row.status || ''}
                       onChange={(v) => updateRow(row.player, v as 'YES' | 'NO' | 'LATE')}
@@ -91,9 +92,18 @@ export function AttendanceTable({ team, date }: { team: string; date: string }) 
                     {saving[row.player] === 'saving' && <Badge>Saving…</Badge>}
                     {saving[row.player] === 'saved' && <Badge>Saved</Badge>}
                     {saving[row.player] === 'error' && (
-                      <span className="text-xs text-red-600">Failed. Retry?</span>
+                      <span className="text-xs text-red-600">Failed. Refresh?</span>
                     )}
                   </div> 
+                </td>
+                <td>
+                  <div className="flex items-center gap-2">
+                    {row.last5Games.map((game, index) => (
+                      <div key={index} className={`${STATUS_OPTIONS.find(opt => opt.value === game)?.color ?? 'bg-gray-600'} p-2 rounded-full`}>
+                        &nbsp;
+                      </div>
+                    ))}
+                  </div>
                 </td>
               </tr>
             ))}

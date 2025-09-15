@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getSheetsClient, getSheetMatrix, normalizeHeaderDate, SPREADSHEET_ID } from '@/lib/sheets'
 
-const ALLOWED: Array<'YES' | 'NO' | 'LATE'> = ['YES', 'NO', 'LATE']
+type StatusType = 'YES' | 'NO' | 'LATE' | '';
+const ALLOWED: Array<StatusType> = ['YES', 'NO', 'LATE']
 
 function columnToA1(n: number) {
   // 1 -> A, 2 -> B, ...
@@ -35,13 +36,24 @@ export async function GET(req: Request) {
     }
     if (colIdx === -1) return NextResponse.json({ error: 'Date not found in sheet header' }, { status: 404 })
 
-    const rows = [] as { player: string; status: 'YES' | 'NO' | 'LATE' | '' }[]
+    const rows = [] as { player: string; status: StatusType }[];
     for (let r = 1; r < matrix.length; r++) {
-      const row = matrix[r]
-      const player = (row?.[0] || '').trim()
-      if (!player) continue
-      const status = ((row?.[colIdx - 1] || '').trim().toUpperCase()) as any
-      rows.push({ player, status: ALLOWED.includes(status) ? status : '' })
+      const row = matrix[r];
+      const player = (row?.[0] || "").trim();
+      if (!player) continue;
+
+      const getStatus = (col: number): StatusType => {
+        const status = (row?.[col - 1] || "").trim().toUpperCase() as any;
+        return ALLOWED.includes(status) ? status : "";
+      };
+
+      const last5Games = [] as StatusType[];
+      for (let col = colIdx; col > 1 && last5Games.length < 5; col--) {
+        last5Games.push(getStatus(col));
+      }
+      last5Games.reverse(); // so oldest is first
+      const status = getStatus(colIdx);
+      rows.push({ player, status, last5Games } as any);
     }
 
     return NextResponse.json({ rows })
