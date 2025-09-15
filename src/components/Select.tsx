@@ -1,7 +1,7 @@
-'use client'
-import * as React from 'react'
+"use client";
+import * as React from "react";
 
-type Option = { label: string; value: string }
+type Option = { label: string; value: string };
 
 export function Select({
   label,
@@ -11,19 +11,23 @@ export function Select({
   disabled,
   placeholder,
 }: {
-  label?: string
-  value?: string
-  onChange: (v: string) => void
-  options: Option[]
-  disabled?: boolean
-  placeholder?: string
+  label?: string;
+  value?: string;
+  onChange: (v: string) => void;
+  options: Option[];
+  disabled?: boolean;
+  placeholder?: string;
 }) {
   return (
     <div className="flex flex-col gap-1">
-      {label && <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{label}</label>}
+      {label && (
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+          {label}
+        </label>
+      )}
       <select
         className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-gray-100"
-        value={value ?? ''}
+        value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
       >
@@ -39,5 +43,5 @@ export function Select({
         ))}
       </select>
     </div>
-  )
+  );
 }
