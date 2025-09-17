@@ -3,8 +3,8 @@ import * as React from "react";
 import { SelectStatus } from "./SelectStatus";
 import { Badge } from "./Badge";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { StatusType } from "@/lib/Status";
 
-export type StatusType = "SI" | "NO" | "TARDE" | "";
 export type AttendanceRow = {
   player: string;
   status: StatusType;
@@ -15,6 +15,7 @@ const STATUS_OPTIONS = [
   { label: "SI", value: "SI", color: "bg-green-500" },
   { label: "NO", value: "NO", color: "bg-red-500" },
   { label: "TARDE", value: "TARDE", color: "bg-yellow-500" },
+  { label: "EXCUSADO", value: "EXCUSADO", color: "bg-green-900" },
 ];
 
 export function AttendanceTable({
@@ -52,14 +53,18 @@ export function AttendanceTable({
     };
   }, [team, date]);
 
-  const updateRow = async (player: string, status: "SI" | "NO" | "TARDE") => {
+  const updateRow = async (player: string, status: StatusType) => {
     setSaving((s) => ({ ...s, [player]: "saving" }));
     // Optimistic UI
     setRows(
       (rows) =>
         rows?.map((r) =>
           r.player === player
-            ? { ...r, status, last5Games: [...r.last5Games.slice(0, -1), status] }
+            ? {
+                ...r,
+                status,
+                last5Games: [...r.last5Games.slice(0, -1), status],
+              }
             : r
         ) ?? null
     );
@@ -119,7 +124,7 @@ export function AttendanceTable({
                   Asistencia
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Ultimos 5
+                  Ultimos
                 </th>
               </tr>
             </thead>
@@ -139,7 +144,7 @@ export function AttendanceTable({
                           options={STATUS_OPTIONS}
                           value={row.status || ""}
                           onChange={(v) =>
-                            updateRow(row.player, v as "SI" | "NO" | "TARDE")
+                            updateRow(row.player, v as StatusType)
                           }
                           placeholder="Elegir..."
                         />
@@ -161,7 +166,7 @@ export function AttendanceTable({
                             key={index}
                             className={`${
                               STATUS_OPTIONS.find((opt) => opt.value === game)
-                                ?.color ?? "bg-gray-600"
+                                ?.color ?? "bg-gray-700"
                             } px-1 rounded-full`}
                           >
                             &nbsp;
