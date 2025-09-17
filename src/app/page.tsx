@@ -25,7 +25,7 @@ export default function Page() {
   const [loadingDates, setLoadingDates] = React.useState(false);
 
   React.useEffect(() => {
-    fetch("/api/teams", { cache: 'no-store' })
+    fetch("/api/teams", { cache: 'no-cache' })
       .then((r) => r.json())
       .then((data) => {
         setTeams(data.teams);
