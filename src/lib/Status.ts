@@ -1,2 +1,2 @@
-export type StatusType = "" | "SI" | "NO" | "TARDE" | "EXCUSADO";
-export const ALLOWED: Array<StatusType> = ["SI", "NO", "TARDE", "EXCUSADO"];
+export type StatusType = "" | "SI" | "NO" | "TARDE" | "EXC";
+export const ALLOWED: Array<StatusType> = ["SI", "NO", "TARDE", "EXC"];
