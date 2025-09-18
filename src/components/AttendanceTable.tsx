@@ -14,7 +14,6 @@ export type AttendanceRow = {
 const STATUS_OPTIONS = [
   { label: "SI", value: "SI", color: "bg-green-500" },
   { label: "NO", value: "NO", color: "bg-red-500" },
-  { label: "TARDE", value: "TARDE", color: "bg-yellow-500" },
   { label: "EXC", value: "EXC", color: "bg-green-900" },
 ];
 
